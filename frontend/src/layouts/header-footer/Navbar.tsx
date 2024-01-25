@@ -1,7 +1,30 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import LoginForm from "../user/LoginForm";
+import RegisterForm from "../user/RegisterForm";
+import FooterForm from "../user/components/FooterForm";
 
 function Navbar() {
+    const [modalOpened, setModalOpened] = useState(false);
+
+    const [showLogin, setShowLogin] = useState(true);
+
+    const toggleForm = () => {
+        setShowLogin(!showLogin);
+    };
+
+    const closeModal = () => {
+        setModalOpened(false);
+    }
+
+    const openModal = (modalType: string) => {
+        if (modalType === "login") {
+            setShowLogin(true);
+        }
+        setModalOpened(true);
+    }
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
@@ -14,21 +37,46 @@ function Navbar() {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Khóa học</a> 
+                            <a className="nav-link" href="#">KHÓA HỌC</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Cộng đồng</a>
+                            <a className="nav-link" href="#">CỘNG ĐỒNG</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Quy định</a>
+                            <a className="nav-link" href="#">QUY ĐỊNH</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Liên hệ</a>
+                            <a className="nav-link" href="#">LIÊN HỆ</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">
-                                <i className="fas fa-user"></i> Login/Sign up
-                            </a>
+                            <Link to="/" className="nav-link" onClick={() => openModal("login")}>
+                                <i className="fas fa-user"></i> LOGIN/SIGN UP
+                            </Link>
+                            <Modal show={modalOpened} onHide={closeModal}>
+                                <ModalHeader closeButton>
+                                    <ModalTitle>
+                                        <h5 className="h1 fw-bold mx-md-4 mt-4">
+                                            {showLogin ? "Đăng nhập" : "Đăng ký"}
+                                        </h5>
+                                    </ModalTitle>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div className="text-center">
+                                        {showLogin ? <LoginForm /> : <RegisterForm />}
+                                        <p>
+                                            {showLogin ? "Not a member? " : "Had an account? "}
+                                            <Link
+                                                to=""
+                                                style={{ textDecoration: "none" }}
+                                                onClick={toggleForm}
+                                            >
+                                                {showLogin ? "Register" : "Login"}
+                                            </Link>
+                                        </p>
+                                        <FooterForm />
+                                    </div>
+                                </ModalBody>
+                            </Modal>
                         </li>
                     </ul>
                 </div>

@@ -40,7 +40,7 @@ function Footer() {
                         </form>
                     </div>
 
-                    <div className="py-4 my-4 border-top">
+                    <div className="py-2 border-top">
                         <p>&copy; 2023 Company, Inc. All rights reserved.</p>
                     </div>
                 </div>

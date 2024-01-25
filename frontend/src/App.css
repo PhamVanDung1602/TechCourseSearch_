@@ -29,18 +29,27 @@
 }
 /* Navbar */
 .navbar-nav .nav-link {
-  font-size: 18px;
-  margin-right: 120px;
+  font-size: 16px;
+  margin-right: 100px;
 }
 .navbar-nav .nav-link:hover {
   color: blue;
 }
+
+.navbar-brand {
+  margin-left:30px;
+}
+
+
 /*----------------------*/
 
 /*Footer*/
 footer {
   font-size:17px;
 }
+
+
+
 
 @keyframes App-logo-spin {
   from {
