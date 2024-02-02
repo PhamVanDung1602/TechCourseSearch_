@@ -31,27 +31,31 @@ function ActivationForm() {
     const [activationCodeInput, setActivationCodeInput] = useState("");
 
     return (
-        <div>
-            <div className="d-flex justify-content-center">
-                <input
-                    type="text"
-                    id="activationCodeInput"
-                    className="centered-input"
-                    placeholder="Mã kích hoạt"
-                    style={{ width: '50%' }}
-                    value={activationCodeInput}
-                    onChange={(e) => setActivationCodeInput(e.target.value)}
-                />
-            </div>
-            <div className="text-center mt-4">
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    style={{ width: '50%' }}
-                    onClick={handleActivateAccount}
-                >
-                    Confirm
-                </button>
+        <div className="container">
+            <div className="custom-card card mt-4">
+                <div className="card-body">
+                    <p>Đăng ký thành công, vui lòng nhập mã kích hoạt!</p>
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            className="centered-input"
+                            id="activationCodeInput"
+                            placeholder="Mã kích hoạt"
+                            value={activationCodeInput}
+                            onChange={(e) => setActivationCodeInput(e.target.value)}
+                        />
+                    </div>
+                    <div className="text-center mt-4">
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            style={{width: '50%'}}
+                            onClick ={handleActivateAccount}
+                        >
+                            Confirm
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

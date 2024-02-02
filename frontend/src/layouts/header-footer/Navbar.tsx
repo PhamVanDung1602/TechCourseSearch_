@@ -30,7 +30,7 @@ function Navbar() {
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
                 <a className="navbar-brand col-3" href="http://localhost:3000">
-                    <img src="images/DP.png" alt="Logo" width="178" height="50" className="d-inline-block align-top" />
+                    <img src={process.env.PUBLIC_URL + "/images/DP.png"} alt="Logo" width="178" height="50" className="d-inline-block align-top" />
                 </a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>

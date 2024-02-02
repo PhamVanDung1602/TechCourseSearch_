@@ -1,7 +1,5 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import { ChangeEvent, useState } from "react";
-import ActivationForm from "./ActivationForm";
-import { useNavigate } from "react-router-dom";
 
 function RegisterForm() {
     const [username, setUsername] = useState('');
@@ -134,14 +132,6 @@ function RegisterForm() {
 
     //SUBMIT-----------------
 
-    const [showModal, setShowModal] = useState(true);
-    const [showActivateForm, setShowActivateForm] = useState(false);
-    const navigate = useNavigate();
-    const handleRegister = async () => {
-        setShowModal(false);
-        setShowActivateForm(true);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         //clear any previous error
         setUsernameError('');
@@ -183,11 +173,8 @@ function RegisterForm() {
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
-
                     const { email, activationCode } = data
-                    handleRegister();
-                    alert("Đăng ký thành công");
-                    navigate(`/activate/${email}/${activationCode}`);
+                    window.location.href = `/activate/${email}/${activationCode}`;
                 } else {
                     alert("Đã xảy ra lỗi trong quá trình đăng ký");
                 }
@@ -196,104 +183,88 @@ function RegisterForm() {
             }
         }
     }
-    //------------------------
-
+    //-----------------------
     return (
         <>
-            {showModal && (
-                <div className="container h-100">
-                    <div className="row d-flex justify-content-center align-items-center h-100">
-                        <div className="col-lg-12 col-xl-11">
-                            <div className="row justify-content-center">
-                                <form className="mx-1 mx-md-4">
-                                    <div className="d-flex flex-row align-items-center mb-4">
-                                        <i className="fas fa-user fa-lg me-3 fa-fw"></i>
-                                        <div className="form-outline flex-fill mb-0">
-                                            <input
-                                                type="text"
-                                                id="username"
-                                                className="form-control"
-                                                placeholder="Username"
-                                                value={username}
-                                                onChange={handleUsernameChange}
-                                            />
-                                            <div className="error-message">{usernameError}</div>
-                                        </div>
+            <div className="container h-100">
+                <div className="row d-flex justify-content-center align-items-center h-100">
+                    <div className="col-lg-12 col-xl-11">
+                        <div className="row justify-content-center">
+                            <form className="mx-1 mx-md-4">
+                                <div className="d-flex flex-row align-items-center mb-4">
+                                    <i className="fas fa-user fa-lg me-3 fa-fw"></i>
+                                    <div className="form-outline flex-fill mb-0">
+                                        <input
+                                            type="text"
+                                            id="username"
+                                            className="form-control"
+                                            placeholder="Username"
+                                            value={username}
+                                            onChange={handleUsernameChange} />
+                                        <div className="error-message">{usernameError}</div>
                                     </div>
+                                </div>
 
-                                    <div className="d-flex flex-row align-items-center mb-4">
-                                        <i className="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                        <div className="form-outline flex-fill mb-0">
-                                            <input
-                                                type="email"
-                                                id="email"
-                                                className="form-control"
-                                                placeholder="Email"
-                                                value={email}
-                                                onChange={handleEmailChange}
-                                            />
-                                            <div className="error-message">{emailError}</div>
-                                        </div>
+                                <div className="d-flex flex-row align-items-center mb-4">
+                                    <i className="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                    <div className="form-outline flex-fill mb-0">
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            className="form-control"
+                                            placeholder="Email"
+                                            value={email}
+                                            onChange={handleEmailChange} />
+                                        <div className="error-message">{emailError}</div>
                                     </div>
+                                </div>
 
-                                    <div className="d-flex flex-row align-items-center mb-4">
-                                        <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
-                                        <div className="form-outline flex-fill mb-0">
-                                            <input
-                                                type="password"
-                                                id="password"
-                                                className="form-control"
-                                                placeholder="Password"
-                                                value={password}
-                                                onChange={handlePasswordChange}
-                                            />
-                                            <div className="error-message">{passwordError}</div>
-                                        </div>
+                                <div className="d-flex flex-row align-items-center mb-4">
+                                    <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                    <div className="form-outline flex-fill mb-0">
+                                        <input
+                                            type="password"
+                                            id="password"
+                                            className="form-control"
+                                            placeholder="Password"
+                                            value={password}
+                                            onChange={handlePasswordChange} />
+                                        <div className="error-message">{passwordError}</div>
                                     </div>
+                                </div>
 
-                                    <div className="d-flex flex-row align-items-center mb-4">
-                                        <i className="fas fa-key fa-lg me-3 fa-fw" ></i>
-                                        <div className="form-outline flex-fill mb-0">
-                                            <input
-                                                type="password"
-                                                id="repeatPassword"
-                                                className="form-control"
-                                                placeholder="Repeat your password"
-                                                value={repeatPassword}
-                                                onChange={handleRepeatPasswordChange}
-                                            />
-                                            <div className="error-message">{repeatPasswordError}</div>
-                                        </div>
+                                <div className="d-flex flex-row align-items-center mb-4">
+                                    <i className="fas fa-key fa-lg me-3 fa-fw"></i>
+                                    <div className="form-outline flex-fill mb-0">
+                                        <input
+                                            type="password"
+                                            id="repeatPassword"
+                                            className="form-control"
+                                            placeholder="Repeat your password"
+                                            value={repeatPassword}
+                                            onChange={handleRepeatPasswordChange} />
+                                        <div className="error-message">{repeatPasswordError}</div>
                                     </div>
+                                </div>
 
-                                    <div className="text-center form-outline mb-4">
-                                        <input className="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
-                                        <label className="form-check-label" htmlFor="form2Example3">
-                                            I agree all statements in <a href="#!" style={{ textDecoration: 'none' }}>Terms of service</a>
-                                        </label>
-                                    </div>
-                                    <div className="text-center">
-                                        <button type="button" className="btn btn-primary" style={{ width: '50%' }} onClick={handleSubmit} >
-                                            Register
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                                <div className="text-center form-outline mb-4">
+                                    <input className="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
+                                    <label className="form-check-label" htmlFor="form2Example3">
+                                        I agree all statements in <a href="#!" style={{ textDecoration: 'none' }}>Terms of service</a>
+                                    </label>
+                                </div>
+                                <div className="text-center">
+                                    <button type="submit" className="btn btn-primary" style={{ width: '50%' }} onClick={handleSubmit}>
+                                        Register
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            )}
-            {showActivateForm && (
-                <div>
-                    <p>Đăng ký thành công!
-                        <br />Xin mời nhập mã code đã gửi qua email vừa được đăng ký để kích hoạt và sử dụng tài khoản.
-                    </p>
-                    <p style={{ color: 'red' }}>Chú ý: Bạn có thể bấm vào "Log in" để quay về đăng nhập hoặc đăng ký bằng 1 trong 4 liên kết thông qua các icon bên dưới nhưng tài khoản bạn vừa đăng ký sẽ không thể kích hoạt và không sử dụng được.</p>
-                    <p>Cảm ơn đã đọc thông báo!</p>
-                    <ActivationForm />
-                </div>
-            )}
+            </div>
         </>
     );
+
 }
 export default RegisterForm

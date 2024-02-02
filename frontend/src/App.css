@@ -206,6 +206,12 @@ select.form-select {
 /*Activation form---*/
 .centered-input {
   text-align: center;
+  width: 50%;
+}
+
+.custom-card {
+  width: 33%; 
+  margin: 0 auto;
 }
 
 @keyframes App-logo-spin {
