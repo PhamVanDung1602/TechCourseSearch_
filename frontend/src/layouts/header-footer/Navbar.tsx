@@ -17,6 +17,7 @@ function Navbar() {
 
     const closeModal = () => {
         setModalOpened(false);
+        setShowLogin(false);
     }
 
     const openModal = (modalType: string) => {
@@ -26,7 +27,7 @@ function Navbar() {
         setModalOpened(true);
     }
     return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
                 <a className="navbar-brand col-3" href="http://localhost:3000">
                     <img src="images/DP.png" alt="Logo" width="178" height="50" className="d-inline-block align-top" />

@@ -1,12 +1,12 @@
 
 function Footer() {
     return (
-        <div className="container" style={{ fontSize: '16px'}}>
-            <footer className="py-5">
+        <div className="container">
+            <footer>
                 <hr className="bold-hr" style={{ width: '100%', color: 'black' }} />
                 <div className="row">
                     <div className="col-md-4 mb-3">
-                        <h5 style={{ marginRight: '180px' }}>DP</h5>
+                        <h5 style={{ marginRight: '130px' }}>DP</h5>
                         <ul>
                             <p className="text-start"><strong>Tên công ty:</strong><span> DP Company</span> <br />
                                 <strong>Đại diện:</strong> <span className="nowrap">John Doe</span> <br />
@@ -45,7 +45,7 @@ function Footer() {
                     </div>
                 </div>
             </footer >
-        </div >
+        </div>
     );
 }
 
