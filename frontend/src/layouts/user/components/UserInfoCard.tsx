@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
-import { Link, Route } from "react-router-dom";
-import ActivateNewAccount from "../ActivationForm";
+import { Link } from "react-router-dom";
 
 function UserInfoCard() {
     //show modal

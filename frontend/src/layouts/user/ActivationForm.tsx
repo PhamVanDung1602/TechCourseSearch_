@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
+interface ActivationFormProps {
+    updateNavbarState : any;
+}
 
-function ActivationForm() {
+function ActivationForm({updateNavbarState} : ActivationFormProps) {
     const { email, activationCode } = useParams();
+
+    const navigate = useNavigate();
 
     const handleActivateAccount = async () => {
         try {
@@ -15,7 +20,8 @@ function ActivationForm() {
             if (response.ok) {
                 if (activationCodeInput === activationCode) {
                     alert("Kích hoạt thành công, vui lòng nhập thông tin cần thiết!")
-                    window.location.href = "/account";
+                    navigate('/account');
+                    updateNavbarState(true);
                 } else {
                     alert("Nhập mã kích hoạt không chính xác, vui lòng kiểm tra lại!");
                 }
