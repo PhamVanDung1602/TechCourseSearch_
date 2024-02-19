@@ -1,9 +1,17 @@
 package Dung.Backend.controller;
 
 import Dung.Backend.entity.User;
+import Dung.Backend.security.JWTResponse;
+import Dung.Backend.security.LoginRequest;
 import Dung.Backend.service.AccountService;
+import Dung.Backend.service.JWTService;
+import Dung.Backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +21,15 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTService jwtService;
 
     //register new account
     @PostMapping("/register")
@@ -26,6 +43,26 @@ public class AccountController {
     public ResponseEntity<?> activateNewAccount(@RequestParam String email,@RequestParam String activationCode){
         ResponseEntity<?> response = accountService.activateNewAccount(email, activationCode);
         return response;
+    }
+
+    //login
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+        //authenticate user by email and password
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+            );
+            // if authentication is successful
+            if (authentication.isAuthenticated()){
+                final String jwt = jwtService.generateToken(loginRequest.getEmail());
+                return ResponseEntity.ok(new JWTResponse(jwt));
+            }
+        }catch(AuthenticationException e) {
+            //is not successful
+            return ResponseEntity.badRequest().body("Email hoặc mật khẩu không chính xác!");
+        }
+        return ResponseEntity.badRequest().body("Xác thực không thành công!");
     }
 
 

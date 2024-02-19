@@ -1,11 +1,14 @@
 package Dung.Backend.service;
 
+import Dung.Backend.dao.RoleRepository;
 import Dung.Backend.dao.UserRepository;
 import Dung.Backend.entity.Notification;
+import Dung.Backend.entity.Role;
 import Dung.Backend.entity.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -16,26 +19,25 @@ public class AccountService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private EmailService emailService;
 
-//    @Autowired
-//    private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     //register new user
     public ResponseEntity<?> registerNewUser(User user){
-        // Check weather username has already been existed
-        if (userRepository.existsByUsername(user.getUsername())){
-            return ResponseEntity.badRequest().body(new Notification("Tên đăng nhập đã tồn tại"));
-        }
 
         //Check weather email has already been existed
         if (userRepository.existsByEmail(user.getEmail())){
             return ResponseEntity.badRequest().body(new Notification("Email đã tồn tại"));
         }
 
-//        //Encode password
-//        String encryptPassword = passwordEncoder.encode(user.getPassword());
-//        user.setPassword(encryptPassword);
+        //Encode password
+        String encryptPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encryptPassword);
 
         //Attach and send activation information
         user.setActivationCode(createActivationCode());
@@ -85,6 +87,9 @@ public class AccountService {
         //handle activating account
         if (activationCode.equals(user.getActivationCode())){
             user.setActivated(true);
+            Role role = roleRepository.findByRoleName("USER");
+            user.getListRole().add(role);
+
             userRepository.save(user);
             return ResponseEntity.ok(new Notification("Kích hoạt tài khoản thành công"));
         } else {

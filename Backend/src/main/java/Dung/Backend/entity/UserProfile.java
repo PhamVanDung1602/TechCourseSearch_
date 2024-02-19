@@ -13,9 +13,6 @@ public class UserProfile {
     @Column(name="user_profile_id")
     private Long userprofileID;
 
-    @Column(name="full_name")
-    private String fullName;
-
     @Column(name="birth_day")
     @Embedded
     private Birthday birthDay;
