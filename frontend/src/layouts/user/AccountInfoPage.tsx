@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import UserInfoCard from "./components/UserInfoCard";
+import { AuthContext } from "../../context/Context";
 
 
 interface CardProps {

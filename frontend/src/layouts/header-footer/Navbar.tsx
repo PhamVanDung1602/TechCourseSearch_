@@ -1,18 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import LoginForm from "../user/LoginForm";
 import RegisterForm from "../user/RegisterForm";
 import FooterForm from "../user/components/FooterForm";
+import { AuthContext } from "../../context/Context";
 
-interface NavbarStateProps {
-    isLoggedin: boolean;
-    setIsLoggedin: (isLoggedin: boolean) => void;
-}
-
-function Navbar({ isLoggedin, setIsLoggedin }: NavbarStateProps) {
+function Navbar() {
+    const authContext = useContext(AuthContext);
+    const { isLoggedIn, updateLoginStatus } = authContext;
     const [modalOpened, setModalOpened] = useState(false);
 
     const [showLogin, setShowLogin] = useState(true);
@@ -34,7 +32,7 @@ function Navbar({ isLoggedin, setIsLoggedin }: NavbarStateProps) {
     }
 
     const handleState = () => {
-        setIsLoggedin(isLoggedin);
+        updateLoginStatus(isLoggedIn);
     }
 
     return (
@@ -62,8 +60,8 @@ function Navbar({ isLoggedin, setIsLoggedin }: NavbarStateProps) {
                         </li>
                         <li className="nav-item dropdown">
                             <>
-                                {isLoggedin ?
-                                    (<Link to="/" className="nav-link" onChange={handleState}>
+                                {isLoggedIn ?
+                                    (<div className="nav-link" onChange={handleState}>
                                         <div className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i className="fas fa-user"></i>
                                         </div>
@@ -74,8 +72,10 @@ function Navbar({ isLoggedin, setIsLoggedin }: NavbarStateProps) {
                                             <li><Link className="dropdown-item" to="#">Danh sách yêu thích</Link></li>
                                             <li><Link className="dropdown-item" to="#">Lịch sử tìm kiếm</Link></li>
                                             <li><Link className="dropdown-item" to="#">Đánh giá và phản hồi</Link></li>
+                                            <hr/>
+                                            <li><Link className="dropdown-item" to="#">Đăng xuất</Link></li>
                                         </ul>
-                                    </Link>
+                                    </div>
                                     ) : (
                                         <><Link to="/" className="nav-link" onClick={() => openModal("login")}>
                                             <i className="fas fa-user"></i> LOGIN/SIGN UP
@@ -90,7 +90,7 @@ function Navbar({ isLoggedin, setIsLoggedin }: NavbarStateProps) {
                                                 </ModalHeader>
                                                 <ModalBody>
                                                     <div className="text-center">
-                                                        {showLogin ? <LoginForm updateNavbarState={handleState} /> : <RegisterForm />}
+                                                        {showLogin ? <LoginForm /> : <RegisterForm />}
                                                         <p>
                                                             {showLogin ? "Not a member? " : "Had an account? "}
                                                             <Link

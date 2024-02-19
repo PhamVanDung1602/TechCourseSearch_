@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState } from "react";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -42,7 +42,7 @@ function UserInfoCard() {
                     <tbody>
                         <tr>
                             <td><span className="fw-lighter fst-italic">Họ tên</span></td>
-                        
+
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Ngày sinh</span></td>
@@ -58,7 +58,7 @@ function UserInfoCard() {
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Địa chỉ</span></td>
-        
+
                         </tr>
                     </tbody>
                 </table>
@@ -168,10 +168,6 @@ function UserInfoCard() {
                     <tbody>
                         <tr>
                             <td><span className="fw-light fst-italic">Email</span></td>
-
-                        </tr>
-                        <tr>
-                            <td><span className="fw-light fst-italic">Tên đăng nhập</span></td>
 
                         </tr>
                         <tr>

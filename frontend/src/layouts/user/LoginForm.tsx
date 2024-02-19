@@ -1,30 +1,30 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/Context";
 
-interface LoginFormProps {
-    updateNavbarState: (isLoggedIn: boolean) => void;
-}
-function LoginForm({updateNavbarState}: LoginFormProps) {
-    const [username, setUsername] = useState('');
+function LoginForm() {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate();
+    const {updateLoginStatus } = useContext(AuthContext);
 
     const handleLogin = async () => {
         const loginRequest = {
-            username: username,
+            email: email,
             password: password
         }
 
         fetch('http://localhost:8080/account/login',
             {
-                method:'POST',
+                method: 'POST',
                 headers: {
-                    'Content-Type':'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(loginRequest)
             }
-        ).then (
+        ).then(
             (response) => {
-                if (response.ok){
+                if (response.ok) {
                     return response.json();
                 } else {
                     throw new Error("Đăng nhập thất bại");
@@ -33,22 +33,22 @@ function LoginForm({updateNavbarState}: LoginFormProps) {
         ).then(
             (data) => {
                 //handle login successful
-                const {jwt} = data;
+                const { jwt } = data;
 
                 //save token to localStorage or cookie
                 localStorage.setItem('token', jwt);
+                
+                //navigate to the main page
+                updateLoginStatus(true);
+                navigate("/");
 
-                //navigate to the main page or post-login tasks
-                window.location.href = "/";
-                updateNavbarState(true);
             }
         ).catch((error) => {
-                //handel login error
-                console.error('Đăng nhập thất bại', error);
-                alert('Đăng nhập thất bại. Vui lòng kiểm tra lại tên đăng nhập hoặc mật khẩu');
-                updateNavbarState(false);
-            }
-            );
+            //handel login error
+            console.error('Đăng nhập thất bại', error);
+            alert('Đăng nhập thất bại. Vui lòng kiểm tra lại tên đăng nhập hoặc mật khẩu');
+        }
+        );
     }
 
 
@@ -59,27 +59,27 @@ function LoginForm({updateNavbarState}: LoginFormProps) {
                     <div className="row justify-content-center">
                         <form className="mx-1 mx-md-4">
                             <div className="d-flex flex-row align-items-center mb-4">
-                                <i className="fas fa-user fa-lg me-3 fa-fw"></i>
+                                <i className="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                 <div className="form-outline flex-fill mb-0">
-                                    <input 
-                                    type="text" 
-                                    id="username" 
-                                    className="form-control" 
-                                    placeholder="Username"
-                                    value = {username}
-                                    onChange = {(e) => setUsername(e.target.value)} />
+                                    <input
+                                        type="text"
+                                        id="email"
+                                        className="form-control"
+                                        placeholder="Email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)} />
                                 </div>
                             </div>
 
                             <div className="d-flex flex-row align-items-center mb-4">
                                 <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
                                 <div className="form-outline flex-fill mb-0">
-                                    <input type="password" 
-                                    id="password" 
-                                    className="form-control" 
-                                    placeholder="Password"
-                                    value = {password}
-                                    onChange = {(e) => setPassword(e.target.value)} />
+                                    <input type="password"
+                                        id="password"
+                                        className="form-control"
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)} />
                                 </div>
                             </div>
 
