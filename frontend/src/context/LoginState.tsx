@@ -1,18 +1,19 @@
 import { ReactNode, createContext, useEffect, useState } from "react";
 
 // create context
-interface AuthContextType {
+interface LoginStateProps {
   isLoggedIn: boolean;
   updateLoginStatus: (status: boolean) => void;
 }
 
-export const AuthContext = createContext<AuthContextType>({
+export const LoginState = createContext<LoginStateProps>({
   isLoggedIn: false,
-  updateLoginStatus: () => {},
+  updateLoginStatus: () => { },
 });
 
+
 // create provider
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const LoginStateProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -20,19 +21,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(storedIsLoggedIn === "true");
   }, []);
 
-  const updateLoginStatus = (status:boolean) => {
+
+  const updateLoginStatus = (status: boolean) => {
     setIsLoggedIn(status);
     localStorage.setItem("isLoggedIn", status.toString());
+
+    if (!status) {
+      localStorage.removeItem('currentPage');
+    }
   };
 
-  const authContextValue: AuthContextType = {
+  const authContextValue: LoginStateProps = {
     isLoggedIn,
     updateLoginStatus,
   };
 
   return (
-    <AuthContext.Provider value={authContextValue}>
+    <LoginState.Provider value={authContextValue}>
       {children}
-    </AuthContext.Provider>
+    </LoginState.Provider>
   );
 };

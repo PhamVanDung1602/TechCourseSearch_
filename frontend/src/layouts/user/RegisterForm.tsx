@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import { ChangeEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ChangeEvent, useContext,useState } from "react";
+import { LoginState } from "../../context/LoginState";
+
 
 function RegisterForm() {
-    const [fullName, setFullName] = useState("");
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
@@ -97,6 +98,7 @@ function RegisterForm() {
     //-----------------------
 
     //SUBMIT-----------------
+
     const handleSubmit = async (e: React.FormEvent) => {
         //clear any previous error
         setEmailError('');
@@ -140,35 +142,58 @@ function RegisterForm() {
                     setEmail(email);
                     setActivationCode(activationCode);
                     handleShowForm();
+                    //handleUserData();
                 } else
                     alert("Đã xảy ra lỗi trong quá trình đăng ký");
             } catch (error) {
                 alert("Đã xảy ra lỗi trong quá trình đăng ký");
             }
         }
-    }
 
+    }
     //-----------------------
+
+    //----SAVE TO REDUX STORE--------
+    /*const dispatch = useDispatch();
+    const handleUserData = () => {
+        const trimmedFullName = fullName.toString().trim();
+        const trimmedEmail = email.trim();
+
+        // send action to update Redux store with values from registration form
+        dispatch(setUserData({ fullName: trimmedFullName, email: trimmedEmail }));
+    };*/
+    //------------------------------
 
     //----HANDLE ACTIVATE ACCOUNT--------
     const [showForm, setShowForm] = useState(false);
     const [activationCodeInput, setActivationCodeInput] = useState("");
     const [activationCode, setActivationCode] = useState("");
-    const navigate = useNavigate();
+    const { updateLoginStatus } = useContext(LoginState);
     const handleShowForm = () => {
         setShowForm(true);
     }
-    const handleActivateAccount = async () => {
+    const handleActivateAccount = async (e: React.FormEvent) => {
+        //avoid clicking continously
+        e.preventDefault();
+
         try {
             const url = `http://localhost:8080/account/activate?email=${email}&activationCode=${activationCode}`;
             const response = await fetch(url, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             });
 
             if (response.ok) {
                 if (activationCodeInput === activationCode) {
-                    alert("Kích hoạt tài khoản thảnh công!");
-                    navigate("/");
+                    const data = await response.json();
+                    const { token, message } = data;
+                    //save token to localStorage or cookie
+                    localStorage.setItem('token', token);
+                    
+                    console.log(message);
+                    updateLoginStatus(true);
                 } else {
                     alert("Nhập mã kích hoạt không chính xác, vui lòng kiểm tra lại!");
                 }

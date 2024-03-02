@@ -1,16 +1,20 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import { useContext, useState } from "react";
-import { Link } from "react-router-dom";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import LoginForm from "../user/LoginForm";
 import RegisterForm from "../user/RegisterForm";
 import FooterForm from "../user/components/FooterForm";
-import { AuthContext } from "../../context/Context";
+import { LoginState } from "../../context/LoginState";
+import { PageState } from "../../context/PageState";
+import { Link } from "react-router-dom";
+
 
 function Navbar() {
-    const authContext = useContext(AuthContext);
-    const { isLoggedIn, updateLoginStatus } = authContext;
+    const loginState = useContext(LoginState);
+    const pageState = useContext(PageState);
+    const { setCurrentPage } = pageState;
+    const { isLoggedIn, updateLoginStatus } = loginState;
     const [modalOpened, setModalOpened] = useState(false);
 
     const [showLogin, setShowLogin] = useState(true);
@@ -34,11 +38,44 @@ function Navbar() {
     const handleState = () => {
         updateLoginStatus(isLoggedIn);
     }
+    
+    //const fullName = useSelector((state: RootState) => state.user.fullName);
+    //const email = useSelector((state: RootState) => state.user.email);
+    const handlePageChange = (page: string) => {
+        setCurrentPage(page);
+      };
+    
+    const handleLogout = async () => {
+        var token = localStorage.getItem('token');
 
+        try {
+            await fetch(`http://localhost:8080/account/logout?token=${token}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                }
+            );
+            localStorage.removeItem('token');
+            // localStorage.removeItem('email');
+
+            updateLoginStatus(false);
+            window.location.reload();
+            handlePageChange("/");
+            
+        } catch (error) {
+            console.error("Xảy ra lỗi:", error);
+        }
+    }
+
+    //-------------------
+    
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
-                <Link className="navbar-brand col-3" to="/">
+                <Link className="navbar-brand col-3" to="/" onClick={() => handlePageChange("/")}>
                     <img src={process.env.PUBLIC_URL + "/images/DP.png"} alt="Logo" width="178" height="50" className="d-inline-block align-top" />
                 </Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,14 +103,16 @@ function Navbar() {
                                             <i className="fas fa-user"></i>
                                         </div>
                                         <ul className="dropdown-menu dropdown-menu-dark">
-                                            <li><Link className="dropdown-item" to="#">Thông tin người dùng</Link></li>
-                                            <li><Link className="dropdown-item" to="#">Khóa học tham gia</Link></li>
+                                            <li><Link className="dropdown-item" to="/account/info" onClick={() => handlePageChange(`/account/info`)}>Thông tin người dùng</Link></li>
+                                            <li><Link className="dropdown-item" to="/account/enrolled-course" onClick={() => handlePageChange(`/account/enrolled-course`)}>Khóa học tham gia</Link></li>
                                             <li><Link className="dropdown-item" to="#">Khóa học tự tạo</Link></li>
                                             <li><Link className="dropdown-item" to="#">Danh sách yêu thích</Link></li>
                                             <li><Link className="dropdown-item" to="#">Lịch sử tìm kiếm</Link></li>
                                             <li><Link className="dropdown-item" to="#">Đánh giá và phản hồi</Link></li>
-                                            <hr/>
-                                            <li><Link className="dropdown-item" to="#">Đăng xuất</Link></li>
+                                            <hr />
+                                            <li>
+                                                <Link className="dropdown-item" to="/" onClick={handleLogout}>Đăng xuất</Link>
+                                            </li>
                                         </ul>
                                     </div>
                                     ) : (

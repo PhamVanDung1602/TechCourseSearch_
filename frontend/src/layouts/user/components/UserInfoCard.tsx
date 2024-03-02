@@ -1,6 +1,13 @@
-import {useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import RequireUser from "../../../context/components/RequireUser";
+interface JwtPayload {
+    fullName: string;
+    sub: string;
+    isUser: boolean;
+}
 
 function UserInfoCard() {
     //show modal
@@ -19,7 +26,130 @@ function UserInfoCard() {
         setShowModal2(false);
     }
 
-    //handle updating user information
+    //handle attach fullname, email
+    const token = localStorage.getItem('token');
+    // decode token
+    const decodedToken = jwtDecode(token ?? '') as JwtPayload;
+    // get info
+    const email = decodedToken.sub;
+    
+    //handle update info
+    const [fullName, setFullName] = useState('');
+    const [gender, setGender] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [day, setDay] = useState('');
+    const [month, setMonth] = useState('');
+    const [year, setYear] = useState('');
+    const [address, setAddress] = useState('');
+
+    //CHECK PASSWORD---------
+    const [phoneNumberError, setPhoneNumberError] = useState("");
+    const checkPhoneNumber = (phoneNumber: string) => {
+        if (phoneNumber === "") {
+            setPhoneNumber("");
+            return true;
+        }
+        const phoneNumberRegex = /^0[0-9]{9}$/;
+        if (!phoneNumberRegex.test(phoneNumber)) {
+            setPhoneNumberError("Số điện thoại phải bắt đầu bằng chữ số 0 và có 10 chữ số");
+            return true;
+        } else {
+            setPhoneNumberError("") // valid
+            return false;
+        }
+    }
+
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        //check password
+        setPhoneNumber(e.target.value);
+
+        //check error
+        setPhoneNumberError('');
+
+        //check conditions
+        checkPhoneNumber(e.target.value);
+    }
+    //-----------------------
+
+    useEffect(() => {
+        // Gửi yêu cầu GET để lấy thông tin người dùng khi component được tạo
+        fetch(`http://localhost:8080/user-info/getUserInfo?email=${email}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    const {fullName, day, month, year, address, phoneNumber, gender} = data;
+                    setFullName(fullName);
+                    setDay(day);
+                    setMonth(month);
+                    setYear(year);
+                    setAddress(address);
+                    setPhoneNumber(phoneNumber);
+                    setGender(gender);
+                }
+            });
+    }, []);
+   
+    const handleUpdateInfo = async (e: React.FormEvent) => {
+        setPhoneNumberError('');
+
+        //avoid clicking continously
+        e.preventDefault();
+
+        if (
+            !fullName &&
+            !day &&
+            !month &&
+            !year &&
+            !gender &&
+            !phoneNumber &&
+            !address
+        ) {
+            console.log('Không có thông tin để cập nhật');
+            return;
+        }
+
+        try {
+            const url1 = `http://localhost:8080/user-info/updateUserFullName?email=${email}`;
+            const url2 = `http://localhost:8080/user-info/updateUserDetails?email=${email}`;
+
+            const headers = {
+                'Content-Type': 'application/json',
+              };
+            const response1 = await fetch(url1, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    fullName: fullName,
+                }),
+            });
+
+            const response2 = await fetch(url2, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    day: day,
+                    month: month,
+                    year: year,
+                    gender: gender,
+                    phoneNumber: phoneNumber,
+                    address: address,
+                }),
+            });
+
+            if (response1.ok && response2.ok) {
+                console.log('Cập nhật thông tin thành công!');
+                window.location.reload();
+            } else {
+                console.log(response1.text());
+                alert('Không cập nhật được thông tin người dùng');
+            }
+        } catch (error) {
+            alert("Đã xảy ra lỗi trong quá trình cập nhật thông tin người dùng");
+        }
+
+    }
+
+
     return (
         <>
             <h2 className="mb-3">Thông tin tài khoản</h2>
@@ -42,23 +172,53 @@ function UserInfoCard() {
                     <tbody>
                         <tr>
                             <td><span className="fw-lighter fst-italic">Họ tên</span></td>
-
+                            <td>
+                                {fullName ? (
+                                    <span className="fw-lighter fst-italic">{fullName}</span>
+                                ) : (
+                                    <span className="fw-lighter fst-italic">Chưa cập nhật</span>
+                                )}
+                            </td>
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Ngày sinh</span></td>
-
+                            <td>
+                                {day && month && year ? (
+                                    <span className="fw-lighter fst-italic">{day}/{month}/{year}</span>
+                                ) : (
+                                    <span className="fw-lighter fst-italic">Chưa cập nhật</span>
+                                )}
+                            </td>
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Giới tính</span></td>
-
+                            <td>
+                                {gender ? (
+                                    <span className="fw-lighter fst-italic">{gender}</span>
+                                ) : (
+                                    <span className="fw-lighter fst-italic">Chưa cập nhật</span>
+                                )}
+                            </td>
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Số điện thoại</span></td>
-
+                            <td>
+                                {phoneNumber ? (
+                                    <span className="fw-lighter fst-italic">{phoneNumber}</span>
+                                ) : (
+                                    <span className="fw-lighter fst-italic">Chưa cập nhật</span>
+                                )}
+                            </td>
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Địa chỉ</span></td>
-
+                            <td>
+                                {address ? (
+                                    <span className="fw-lighter fst-italic">{address}</span>
+                                ) : (
+                                    <span className="fw-lighter fst-italic">Chưa cập nhật</span>
+                                )}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -67,7 +227,7 @@ function UserInfoCard() {
             {/* Update user infomation */}
             <div className="text-center">
                 <button type="button" className="Card Card-button">
-                    <Link to="" style={{ textDecoration: 'none', color: 'black' }} onClick={openModal1}>
+                    <Link to="/account/info" style={{ textDecoration: 'none', color: 'black' }} onClick={openModal1}>
                         <div className="Card-button-content">
                             <span className="button-text"><strong>CẬP NHẬT</strong></span>
                         </div>
@@ -88,7 +248,13 @@ function UserInfoCard() {
                                             <form className="mx-1 mx-md-4">
                                                 <div className="d-flex flex-row align-items-center mb-4">
                                                     <div className="form-outline flex-fill mb-0">
-                                                        <input type="text" style={{ borderRadius: '20px' }} id="form3Example1c" className="form-control" placeholder="Họ tên của bạn" />
+                                                        <input type="text"
+                                                            style={{ borderRadius: '20px' }}
+                                                            id="fullName"
+                                                            className="form-control"
+                                                            placeholder="Họ tên của bạn"
+                                                            onChange={(e) => setFullName(e.target.value)}
+                                                        />
                                                     </div>
                                                 </div>
 
@@ -96,7 +262,7 @@ function UserInfoCard() {
                                                     <div className="form-outline flex-fill mb-0">
                                                         <div className="row">
                                                             <div className="col-4">
-                                                                <select className="form-select" id="day" name="day">
+                                                                <select className="form-select" id="day" name="day" onChange={(e) => setDay(e.target.value)}>
                                                                     <option value="">Ngày</option>
                                                                     {Array.from({ length: 31 }, (_, index) => (
                                                                         <option key={index + 1} value={index + 1}>{index + 1}</option>
@@ -104,7 +270,7 @@ function UserInfoCard() {
                                                                 </select>
                                                             </div>
                                                             <div className="col-4">
-                                                                <select className="form-select" id="month" name="month">
+                                                                <select className="form-select" id="month" name="month" onChange={(e) => setMonth(e.target.value)}>
                                                                     <option value="">Tháng</option>
                                                                     {Array.from({ length: 12 }, (_, index) => (
                                                                         <option key={index + 1} value={index + 1}>{index + 1}</option>
@@ -112,7 +278,7 @@ function UserInfoCard() {
                                                                 </select>
                                                             </div>
                                                             <div className="col-4">
-                                                                <select className="form-select" id="year" name="year" >
+                                                                <select className="form-select" id="year" name="year" onChange={(e) => setYear(e.target.value)} >
                                                                     <option value="">Năm</option>
                                                                     {Array.from({ length: 100 }, (_, index) => {
                                                                         const year = new Date().getFullYear() - index;
@@ -126,7 +292,7 @@ function UserInfoCard() {
 
                                                 <div className="d-flex flex-row align-items-center mb-4">
                                                     <div className="form-outline flex-fill mb-0">
-                                                        <select className="form-select" id="gender" name="gender">
+                                                        <select className="form-select" id="gender" name="gender" onChange={(e) => setGender(e.target.value)}>
                                                             <option value="">Chọn giới tính</option>
                                                             <option value="Nam">Nam</option>
                                                             <option value="Nữ">Nữ</option>
@@ -136,18 +302,21 @@ function UserInfoCard() {
 
                                                 <div className="d-flex flex-row align-items-center mb-4">
                                                     <div className="form-outline flex-fill mb-0">
-                                                        <input type="text" style={{ borderRadius: '20px' }} id="form3Example1c" className="form-control" placeholder="Số điện thoại" />
+                                                        <input type="text" style={{ borderRadius: '20px' }} id="phoneNumber" className="form-control" placeholder="Số điện thoại"
+                                                        onChange={handlePhoneNumberChange} />
+                                                        <div className="error-message">{phoneNumberError}</div>
                                                     </div>
                                                 </div>
 
                                                 <div className="d-flex flex-row align-items-center mb-4">
                                                     <div className="form-outline flex-fill mb-0">
-                                                        <input type="text" style={{ borderRadius: '20px' }} id="form3Example1c" className="form-control" placeholder="Địa chỉ" />
+                                                        <input type="text" style={{ borderRadius: '20px' }} id="address" className="form-control" placeholder="Địa chỉ"
+                                                        onChange={(e) => setAddress(e.target.value)} />
                                                     </div>
                                                 </div>
 
                                                 <div className="text-center">
-                                                    <button type="submit" className="btn btn-primary" style={{ borderRadius: '20px', width: '50%' }}>Cập nhật tài khoản</button>
+                                                    <button type="submit" className="btn btn-primary" style={{ borderRadius: '20px', width: '50%' }} onClick={handleUpdateInfo}>Cập nhật tài khoản</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -162,17 +331,17 @@ function UserInfoCard() {
             <hr className="mt-4" style={{ width: "80%", margin: "auto", textAlign: "center" }} />
 
             <h2 className="mt-4">Thông tin đăng nhập</h2>
-            {/* Email, username, password */}
+            {/* Email, password */}
             <div className="table-container">
                 <table className="table table-striped custom-table">
                     <tbody>
                         <tr>
                             <td><span className="fw-light fst-italic">Email</span></td>
-
+                            <td><span className="fw-lighter fst-italic">{email}</span></td>
                         </tr>
                         <tr>
                             <td><span className="fw-light fst-italic">Mật khẩu</span></td>
-
+                            <td><span className="fw-lighter fst-italic">*************</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -181,7 +350,7 @@ function UserInfoCard() {
             {/* Change new password*/}
             <div className="text-center">
                 <button type="button" className="Card Card-button">
-                    <Link to="" style={{ textDecoration: 'none', color: 'black' }} onClick={openModal2}>
+                    <Link to="/account/info" style={{ textDecoration: 'none', color: 'black' }} onClick={openModal2}>
                         <div className="Card-button-content">
                             <span className="button-text"><strong>CẬP NHẬT</strong></span>
                         </div>
@@ -255,4 +424,7 @@ function UserInfoCard() {
     );
 }
 
-export default UserInfoCard
+
+const UserInfoCard_User = RequireUser(UserInfoCard);
+
+export default UserInfoCard_User

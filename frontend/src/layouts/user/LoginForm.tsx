@@ -1,13 +1,10 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/Context";
+import { LoginState } from "../../context/LoginState";
 
 function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate();
-    const {updateLoginStatus } = useContext(AuthContext);
-
+    const { updateLoginStatus } = useContext(LoginState);
     const handleLogin = async () => {
         const loginRequest = {
             email: email,
@@ -31,17 +28,16 @@ function LoginForm() {
                 }
             }
         ).then(
-            (data) => {
+            async (data) => {
                 //handle login successful
                 const { jwt } = data;
 
                 //save token to localStorage or cookie
                 localStorage.setItem('token', jwt);
-                
+
                 //navigate to the main page
                 updateLoginStatus(true);
-                navigate("/");
-
+                
             }
         ).catch((error) => {
             //handel login error

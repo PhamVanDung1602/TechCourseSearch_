@@ -1,6 +1,6 @@
 class UserModel {
     userID : number;
-    username? : string;
+    fullName?: string;
     password? : string;
     email?: string;
     activated?: boolean;
@@ -8,14 +8,14 @@ class UserModel {
 
     constructor(
         userID : number,
-        username? : string,
+        fullName?: string,
         password? : string,
         email?: string,
         activated?: boolean,
         activationCode?: string
     ){
         this.userID = userID;
-        this.username = username;
+        this.fullName = fullName;
         this.password = password;
         this.email = email;
         this.activated = activated;
