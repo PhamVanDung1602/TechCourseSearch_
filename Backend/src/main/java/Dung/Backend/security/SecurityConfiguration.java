@@ -1,8 +1,7 @@
 package Dung.Backend.security;
 
-import Dung.Backend.filter.JWTFilter;
-import Dung.Backend.service.UserService;
-import jakarta.websocket.Endpoint;
+import Dung.Backend.service.jwt.JWTFilter;
+import Dung.Backend.service.account.UserSecurityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,9 +32,9 @@ public class SecurityConfiguration {
 
     @Bean
     @Autowired
-    public DaoAuthenticationProvider authenticationProvider(UserService userService){
+    public DaoAuthenticationProvider authenticationProvider(UserSecurityServiceImpl userSecurityServiceImpl){
         DaoAuthenticationProvider dap = new DaoAuthenticationProvider();
-        dap.setUserDetailsService(userService);
+        dap.setUserDetailsService(userSecurityServiceImpl);
         dap.setPasswordEncoder(passwordEncoder());
         return dap;
     }
@@ -52,6 +51,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
+
         );
 
         //CORS configuration

@@ -1,7 +1,10 @@
-package Dung.Backend.service;
+package Dung.Backend.service.jwt;
 
 import Dung.Backend.entity.Role;
 import Dung.Backend.entity.User;
+import Dung.Backend.entity.UserProfile;
+import Dung.Backend.service.account.UserSecurityServiceImpl;
+import Dung.Backend.service.user.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,18 +27,19 @@ public class JWTService {
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
     @Autowired
-    private UserService userService;
+    private UserSecurityServiceImpl userSecurityServiceImpl;
+
 
     //create JWT based on username
     public String generateToken(String email){
         Map<String, Object> claims = new HashMap<>();
-        User user = userService.findByEmail(email);
+        User user = userSecurityServiceImpl.findByEmail(email);
 
         boolean isAdmin = false;
         boolean isStaff = false;
         boolean isUser = false;
 
-        if(user == null && user.getListRole().size()>0){
+        if(user != null && user.getListRole().size()>0){
             List<Role> list = user.getListRole();
             for (Role r:list){
                 if(r.getRoleName().equals("ADMIN")){
@@ -57,12 +61,12 @@ public class JWTService {
     }
 
     //create JWT with selected claims
-    private String createTokenWithSelectedClaims(Map<String, Object> claims, String username) {
+    private String createTokenWithSelectedClaims(Map<String, Object> claims, String email) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+12*60*60*1000))//JWT lasts for 12hours
+                .setExpiration(new Date(System.currentTimeMillis()+6*60*60*1000))//JWT lasts for 30 mins
                 .signWith(SignatureAlgorithm.HS256,getSignKey())
                 .compact();
     }
@@ -85,24 +89,24 @@ public class JWTService {
 
     //check expiration of JWT
     public Date extractExpiration(String token){
-        return (Date) extractClaim(token, Claims::getExpiration);
+        return extractClaim(token, Claims::getExpiration);
     }
 
-    //extract username
+    //extract email
     public String extractEmail(String token){
         return extractClaim(token, Claims::getSubject);
     }
 
     //Check expired JWT
     public Boolean isTokenExpired(String token){
-        return extractExpiration(token).before(new Date(System.currentTimeMillis()));
+        return extractExpiration(token).before(new Date());
     }
 
     //check for validity
     public Boolean validateToken(String token, UserDetails userDetails){
         final String email = extractEmail(token);
-        System.out.println(email);
         return (email.equals(userDetails.getUsername())&& isTokenExpired(token));
     }
+
 
 }

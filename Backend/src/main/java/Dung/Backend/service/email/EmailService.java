@@ -1,4 +1,4 @@
-package Dung.Backend.service;
+package Dung.Backend.service.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

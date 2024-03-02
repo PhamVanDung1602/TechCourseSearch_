@@ -1,8 +1,10 @@
-package Dung.Backend.service;
+package Dung.Backend.service.account;
 
+import Dung.Backend.dao.UserProfileRepository;
 import Dung.Backend.dao.UserRepository;
 import Dung.Backend.entity.Role;
 import Dung.Backend.entity.User;
+import Dung.Backend.entity.UserProfile;
 import Dung.Backend.exception.ActivationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,10 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService implements UserServiceInterface {
+public class UserSecurityServiceImpl implements UserSecurityService {
     private UserRepository userRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserSecurityServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -40,6 +43,7 @@ public class UserService implements UserServiceInterface {
         if (!user.isActivated()){
             throw new ActivationException("Tài khoản chưa được kích hoạt để đăng nhập!");
         }
+
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 rolesToAuthorities(user.getListRole()));
     }

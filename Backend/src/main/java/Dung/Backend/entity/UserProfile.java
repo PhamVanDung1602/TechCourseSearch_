@@ -13,9 +13,14 @@ public class UserProfile {
     @Column(name="user_profile_id")
     private Long userprofileID;
 
-    @Column(name="birth_day")
-    @Embedded
-    private Birthday birthDay;
+    @Column(name="day")
+    private String day;
+
+    @Column(name="month")
+    private String month;
+
+    @Column(name="year")
+    private String year;
 
     @Column(name="address")
     private String address;
@@ -31,7 +36,7 @@ public class UserProfile {
     @Lob
     private String avatar;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {
+    @OneToOne(fetch = FetchType.EAGER, cascade = {
             CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
     })
     @JoinColumn(name="user_id")

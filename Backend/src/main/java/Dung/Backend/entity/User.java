@@ -14,14 +14,14 @@ public class User {
     @Column(name="user_id")
     private Long userID;
 
-    @Column(name="full_name")
-    private String fullName;
-
     @Column(name="password")
     private String password;
 
     @Column(name="email")
     private String email;
+
+    @Column(name="full_name")
+    private String fullName;
 
     @Column(name="activated")
     private boolean activated;
@@ -30,7 +30,7 @@ public class User {
     private String activationCode;
 
     @OneToOne( mappedBy = "user",
-            fetch = FetchType.LAZY, cascade = {
+            fetch = FetchType.EAGER, cascade = {
             CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
     })
     private UserProfile userProfile;

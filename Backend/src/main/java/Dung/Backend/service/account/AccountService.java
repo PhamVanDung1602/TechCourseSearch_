@@ -1,17 +1,20 @@
-package Dung.Backend.service;
+package Dung.Backend.service.account;
 
 import Dung.Backend.dao.RoleRepository;
+import Dung.Backend.dao.UserProfileRepository;
 import Dung.Backend.dao.UserRepository;
 import Dung.Backend.entity.Notification;
 import Dung.Backend.entity.Role;
 import Dung.Backend.entity.User;
+import Dung.Backend.entity.UserProfile;
+import Dung.Backend.service.email.EmailService;
+import Dung.Backend.service.jwt.JWTResponse;
+import Dung.Backend.service.jwt.JWTService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -22,10 +25,17 @@ public class AccountService {
     private RoleRepository roleRepository;
 
     @Autowired
+    private UserProfileRepository userProfileRepository;
+
+    @Autowired
     private EmailService emailService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JWTService jwtService;
+
 
     //register new user
     public ResponseEntity<?> registerNewUser(User user){
@@ -34,6 +44,7 @@ public class AccountService {
         if (userRepository.existsByEmail(user.getEmail())){
             return ResponseEntity.badRequest().body(new Notification("Email đã tồn tại"));
         }
+
 
         //Encode password
         String encryptPassword = passwordEncoder.encode(user.getPassword());
@@ -46,13 +57,28 @@ public class AccountService {
         //Send email to user for activation
         sendActivationCodeToEmail(user.getEmail(), user.getActivationCode());
 
+        //create user profile
+        UserProfile userProfile = new UserProfile();
+        userProfile.setGender("Unknown");
+        userProfile.setDay("Unknown");
+        userProfile.setMonth("Unknown");
+        userProfile.setYear("Unknown");
+        userProfile.setPhoneNumber("Unknown");
+        userProfile.setAddress("Unknown");
+        userProfile.setAvatar("Unknown");
 
         //Save user to the db
-        User registeredUser = userRepository.save(user);
+        user.setUserProfile(userProfile);
+        User registedUser = userRepository.save(user);
 
-        //get activation code and email
-        String email = user.getEmail();
-        String activationCode = user.getActivationCode();
+
+
+        userProfile.setUser(registedUser);
+        userProfileRepository.save(userProfile);
+
+        //get email
+        String email = registedUser.getEmail();
+        String activationCode = registedUser.getActivationCode();
         return ResponseEntity.ok(new ActivationCodeEmail(email, activationCode));
     }
 
@@ -91,11 +117,14 @@ public class AccountService {
             user.getListRole().add(role);
 
             userRepository.save(user);
-            return ResponseEntity.ok(new Notification("Kích hoạt tài khoản thành công"));
+
+            String token = jwtService.generateToken(user.getEmail());
+            String message = "Đăng ký thành công!";
+
+            return ResponseEntity.ok(new RegistrationResponse(token,message));
         } else {
             return ResponseEntity.badRequest().body(new Notification("Mã kích hoạt không chính xác!"));
         }
     }
-
 
 }

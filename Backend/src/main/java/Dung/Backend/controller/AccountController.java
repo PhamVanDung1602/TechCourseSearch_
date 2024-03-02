@@ -1,11 +1,12 @@
 package Dung.Backend.controller;
 
 import Dung.Backend.entity.User;
-import Dung.Backend.security.JWTResponse;
-import Dung.Backend.security.LoginRequest;
-import Dung.Backend.service.AccountService;
-import Dung.Backend.service.JWTService;
-import Dung.Backend.service.UserService;
+import Dung.Backend.service.jwt.BlackListToken;
+import Dung.Backend.service.jwt.JWTResponse;
+import Dung.Backend.service.account.LoginRequest;
+import Dung.Backend.service.account.AccountService;
+import Dung.Backend.service.jwt.JWTService;
+import Dung.Backend.service.account.UserSecurityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +24,7 @@ public class AccountController {
     private AccountService accountService;
 
     @Autowired
-    private UserService userService;
+    private UserSecurityServiceImpl userSecurityServiceImpl;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -64,6 +65,19 @@ public class AccountController {
         }
         return ResponseEntity.badRequest().body("Xác thực không thành công!");
     }
+
+    //logout
+    @Autowired
+    private BlackListToken blackListToken;
+
+    @PostMapping("/logout")
+    public void logout(@RequestParam("token") String token){
+        if(token!=null){
+            blackListToken.addToBlackList(token);
+        }
+    }
+
+
 
 
 

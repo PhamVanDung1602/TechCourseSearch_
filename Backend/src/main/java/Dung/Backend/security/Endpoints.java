@@ -5,17 +5,27 @@ public class Endpoints {
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
             "/account/register",
-            "/account/login"
+            "/account/login",
+            "/account/logout",
+            "/user-info/updateUserFullName",
+            "/user-info/updateUserDetails"
     };
 
     public static final String[] PUBLIC_GET_ENDPOINTS = {
             "user/search/existsByEmail",
             "user/search/existsByUsername",
-            "/account/activate"
+            "/account/activate",
+            "/user-info/getUserInfo"
     };
 
     public static final String[] ADMIN_GET_ENDPOINTS = {
             "/user",
-            "/user/**"
+            "/user/**",
+            "/user_profile",
+            "/user_profile/**"
     };
+
+
+
+
 }

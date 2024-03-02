@@ -1,7 +1,6 @@
-package Dung.Backend.filter;
+package Dung.Backend.service.jwt;
 
-import Dung.Backend.service.JWTService;
-import Dung.Backend.service.UserService;
+import Dung.Backend.service.account.UserSecurityServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,8 +21,10 @@ public class JWTFilter extends OncePerRequestFilter {
     private JWTService jwtService;
 
     @Autowired
-    private UserService userService;
+    private UserSecurityServiceImpl userSecurityServiceImpl;
 
+    @Autowired
+    private BlackListToken blackListToken;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,7 +38,15 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication()==null){
-            UserDetails userDetails = userService.loadUserByUsername(email);
+
+            //Check if token is in blacklist
+            if(blackListToken.isTokenBlackListed(token)) {
+                //token is refused
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ");
+                return;
+            }
+
+            UserDetails userDetails = userSecurityServiceImpl.loadUserByUsername(email);
             if(jwtService.validateToken(token,userDetails)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
